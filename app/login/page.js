@@ -1,17 +1,21 @@
 
 "use client"
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useSession, signIn, signOut } from "next-auth/react"
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 const page = () => {
      const { data: session } = useSession()
-     if (session) {
-    const router = useRouter()
-    router.push('/dashboard')
     
-  }
+    const router = useRouter()
+    useEffect(() => {
+    if (session) {
+      router.push('/dashboard')
+    }
+  }, [session, router])
+    
+ 
   return (
     <div className='text-white py-14 container mx-auto '>
       <h1 className='text-center font-bold text-3xl'>Login/Signup to Get your fans to support you</h1>
