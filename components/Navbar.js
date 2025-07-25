@@ -20,7 +20,7 @@ const Navbar = () => {
         className="logo font-bold text-xl flex justify-center items-center"
       >
         <span>GetMeAChai</span>
-        <img src="/tea.gif" width={44} alt="" />
+        <img className="invertImg" src="/tea.gif" width={44} alt="" />
       </Link>
 
       {/* <ul className="flex justify-between gap-4">
@@ -67,7 +67,7 @@ const Navbar = () => {
             <div
               id="dropdown"
               className={`z-10 ${
-                showdropdown ? " " : "hidden"
+                showdropdown ? "" : "hidden"
               } absolute left-[130px] bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700`}
             >
               <ul
@@ -84,7 +84,7 @@ const Navbar = () => {
                 </li>
                 <li>
                   <Link
-                    href="#"
+                    href={`/${session.user.name}`}
                     className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                   >
                     Your Page
@@ -92,7 +92,7 @@ const Navbar = () => {
                 </li>
 
                 <li>
-                  <Link
+                  <button
                     onClick={() => {
                       signOut();
                     }}
@@ -100,7 +100,7 @@ const Navbar = () => {
                     className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                   >
                     Sign out
-                  </Link>
+                  </button>
                 </li>
               </ul>
             </div>
