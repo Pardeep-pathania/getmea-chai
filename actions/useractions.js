@@ -2,6 +2,7 @@
 
 import connectDB from "@/app/db/connectDB"
 import Payment from "@/app/models/Payment"
+import User from "@/app/models/User"
 import Razorpay from "razorpay"
 
 
@@ -33,4 +34,22 @@ export const initiate = async (amount, to_username, paymentform) =>{
         name: paymentform.name, message: paymentform.message
     })
     return x
+}
+
+export const fetchuser = async (username) =>{
+    await connectDB()
+    let u = await User.findOne({username: username})
+    let user = u.toObject({flattenObjectIds: true})
+   
+    return user
+}
+
+export const fetchpayments = async (username) => {
+    await connectDB()
+    let p = await Payment.find({to_user: username}).sort({amount: -1}).lean()
+    // Convert _id to string for each payment
+    return p.map(payment => ({
+        ...payment,
+        _id: payment._id?.toString ? payment._id.toString() : payment._id
+    }))
 }

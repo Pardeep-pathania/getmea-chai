@@ -1,17 +1,34 @@
 "use client";
 
-import { initiate } from "@/actions/useractions";
+import { fetchpayments, fetchuser, initiate } from "@/actions/useractions";
 import Script from "next/script";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 
 const PaymentPage = ({ username }) => {
 
     const {data:session} = useSession()
     const [paymentform, setPaymentform] = useState({name: "", message: "", amount: "" })
+    const [currentuser, setcurrentuser] = useState({})
+    const [payments, setPayments] = useState([])
+
+    useEffect(()=>{
+      getData()
+    },[])
 
     const handleChange = (e) =>{
         setPaymentform({...paymentform, [e.target.name] : e.target.value})
+    }
+
+    const getData = async ()=>{
+      let u = await fetchuser(username)
+      setcurrentuser(u)
+
+      let dbpayments = await fetchpayments(username)
+      
+      setPayments(dbpayments)
+      console.log(u, dbpayments);
+      
     }
 
     const pay = async(amount) =>{
@@ -28,7 +45,7 @@ const PaymentPage = ({ username }) => {
     "description": "Test Transaction",
     "image": "https://example.com/your_logo",
     "order_id": orderId, // This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-    "callback_url": `${process.env.URL}/api/razorpay`, "prefill" : { //We recommend using the prefill parameter to auto-fill customer's contact information especially their phone number
+    "callback_url": `${process.env.NEXT_PUBLIC_URL}/api/razorpay`, "prefill" : { //We recommend using the prefill parameter to auto-fill customer's contact information especially their phone number
         "name": "Gaurav Kumar", //your customer's name
         "email": "gaurav.kumar@example.com",
         "contact": "+919876543210" //Provide the customer's phone number for better conversion rates 
@@ -75,48 +92,15 @@ var rzp1 = new Razorpay(options);
             {/* Show list of all supporters as a leaderboard */}
             <h2 className="text-2xl font-bold my-5">Supporters</h2>
             <ul className="mx-5 text-lg">
-              <li className="my-2 flex gap-2 items-center">
+
+              {payments.map((p, i) => {
+               return <li key={i} className="my-2 flex gap-2 items-center">
                 <img src="/avatar.gif" alt="user avatar" width={33} />
                 <span>
-                  Shubham donated <span className="font-bold">₹ 30 </span> with a message "I support you bro. Lots of ❤️"
+                  {p.name} donated <span className="font-bold">₹{p.amount} </span> with a message "{p.message}"
                 </span>
               </li>
-            <li className="my-2 flex gap-2 items-center">
-                <img src="/avatar.gif" alt="user avatar" width={33} />
-                <span>
-                  Shubham donated <span className="font-bold">₹ 30 </span> with a message "I support you bro. Lots of ❤️"
-                </span>
-              </li>
-               <li className="my-2 flex gap-2 items-center">
-                <img src="/avatar.gif" alt="user avatar" width={33} />
-                <span>
-                  Shubham donated <span className="font-bold">₹ 30 </span> with a message "I support you bro. Lots of ❤️"
-                </span>
-              </li>
-               <li className="my-2 flex gap-2 items-center">
-                <img src="/avatar.gif" alt="user avatar" width={33} />
-                <span>
-                  Shubham donated <span className="font-bold">₹ 30 </span> with a message "I support you bro. Lots of ❤️"
-                </span>
-              </li>
-               <li className="my-2 flex gap-2 items-center">
-                <img src="/avatar.gif" alt="user avatar" width={33} />
-                <span>
-                  Shubham donated <span className="font-bold">₹ 30 </span> with a message "I support you bro. Lots of ❤️"
-                </span>
-              </li>
-               <li className="my-2 flex gap-2 items-center">
-                <img src="/avatar.gif" alt="user avatar" width={33} />
-                <span>
-                  Shubham donated <span className="font-bold">₹ 30 </span> with a message "I support you bro. Lots of ❤️"
-                </span>
-              </li>
-               <li className="my-2 flex gap-2 items-center">
-                <img src="/avatar.gif" alt="user avatar" width={33} />
-                <span>
-                  Shubham donated <span className="font-bold">₹ 30 </span> with a message "I support you bro. Lots of ❤️"
-                </span>
-              </li>
+              } )}             
 
             </ul>
           </div>
