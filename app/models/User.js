@@ -9,6 +9,9 @@ const UserSchema = new mongoose.Schema({
     coverpic: {type: String},
     createdAt: {type: Date, default: Date.now},
     updatedAt: {type: Date, default: Date.now},
+    razorpayid: {type: String, default: ""},
+    razorpaysecret: {type: String, default: ""},
+    done: {type:Boolean, default: false}
 })
 
 

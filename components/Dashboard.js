@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import { useSession, signIn, signOut } from "next-auth/react"
 import { useRouter } from 'next/navigation'
-// import { fetchuser, updateProfile } from '@/actions/useractions'
+import { fetchuser, updateProfile } from '@/actions/useractions'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Bounce } from 'react-toastify';
@@ -19,14 +19,14 @@ const Dashboard = () => {
             router.push('/login')
         }
         else {
-            // getData()
+            getData()
         }
     }, [])
 
-    // const getData = async () => {
-    //     let u = await fetchuser(session.user.name)
-    //     setform(u)
-    // }
+    const getData = async () => {
+        let u = await fetchuser(session.user.name)
+        setform(u)
+    }
 
     const handleChange = (e) => {
         setform({ ...form, [e.target.name]: e.target.value })
@@ -34,7 +34,8 @@ const Dashboard = () => {
 
     const handleSubmit = async (e) => {
 
-        // let a = await updateProfile(e, session.user.name)
+        let a = await updateProfile(e, session.user.name)
+        alert("Profile Updated")
         // toast('Profile Updated', {
         //     position: "top-right",
         //     autoClose: 5000,
