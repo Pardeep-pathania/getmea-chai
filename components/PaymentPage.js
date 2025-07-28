@@ -3,18 +3,41 @@
 import { fetchpayments, fetchuser, initiate } from "@/actions/useractions";
 import Script from "next/script";
 import React, { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
+// import { useSession } from "next-auth/react";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Bounce } from 'react-toastify';
+import { useSearchParams } from "next/navigation";
 
 const PaymentPage = ({ username }) => {
 
-    const {data:session} = useSession()
+    // const {data:session} = useSession()
     const [paymentform, setPaymentform] = useState({name: "", message: "", amount: "" })
     const [currentuser, setcurrentuser] = useState({})
     const [payments, setPayments] = useState([])
+    const searchParams = useSearchParams()
 
     useEffect(()=>{
       getData()
     },[])
+
+     useEffect(() => {
+        if(searchParams.get("paymentdone") == "true"){
+        toast('Thanks for your donation!', {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+            });
+        }
+        // router.push(`/${username}`)
+     
+    }, [])
 
     const handleChange = (e) =>{
         setPaymentform({...paymentform, [e.target.name] : e.target.value})
@@ -38,7 +61,7 @@ const PaymentPage = ({ username }) => {
         let orderId = a.id
 
         var options = {
-    "key": process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, // Enter the Key ID generated from the Dashboard
+    "key": currentuser.razorpayid, // Enter the Key ID generated from the Dashboard
     "amount": amount, // Amount is in currency subunits. 
     "currency": "INR",
     "name": "Get Me A Chai", //your business name
@@ -62,18 +85,31 @@ var rzp1 = new Razorpay(options);
     }
   return (
     <>
+     <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light" />
+            {/* Same as */}
+            <ToastContainer />
       <Script src="https://checkout.razorpay.com/v1/checkout.js"></Script>
 
       <div className="cover w-full relative">
         <img
-          src="https://c10.patreonusercontent.com/4/patreon-media/p/campaign/4842667/452146dcfeb04f38853368f554aadde1/eyJ3IjoxOTIwLCJ3ZSI6MX0%3D/18.gif?token-hash=2XoNFaHKobezslMvn4tj7xA6qgIPOBaiMNFvHpZ859g%3D&token-time=1754265600"
+          src={currentuser.coverpic || "https://c10.patreonusercontent.com/4/patreon-media/p/campaign/4842667/452146dcfeb04f38853368f554aadde1/eyJ3IjoxOTIwLCJ3ZSI6MX0%3D/18.gif?token-hash=2XoNFaHKobezslMvn4tj7xA6qgIPOBaiMNFvHpZ859g%3D&token-time=1754265600"}
           alt=""
           className="object-cover w-full h-[350px]"
         />
         <div className="absolute -bottom-15  right-[46%] border-2 border-white rounded-full ">
           <img
             className="rounded-full"
-            src="https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg"
+            src={ currentuser.profilepic ||  "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg"}
             alt=""
             width={100}
             height={100}
@@ -82,9 +118,9 @@ var rzp1 = new Razorpay(options);
       </div>       
       <div className="info flex justify-center items-center flex-col gap-2 my-24">
         <div className="font-bold text-lg ">@{username}</div>
-        <div className="text-slate-400">Creating Animated art for VIT's</div>
+        <div className="text-slate-400">Lets help {username} get a Chai</div>
         <div className="text-slate-400">
-          9719 members 82 posts ₹ 15, 450/release
+          {payments.length} Payments . ₹{payments.reduce((acc, curr) => acc + curr.amount, 0)} raised
         </div>
 
         <div className="payment flex gap-3 w-[80%] mt-11">
@@ -92,6 +128,8 @@ var rzp1 = new Razorpay(options);
             {/* Show list of all supporters as a leaderboard */}
             <h2 className="text-2xl font-bold my-5">Supporters</h2>
             <ul className="mx-5 text-lg">
+
+              {payments.length === 0 && <p className="text-center text-gray-500">No Supporters Yet</p>}
 
               {payments.map((p, i) => {
                return <li key={i} className="my-2 flex gap-2 items-center">
@@ -138,7 +176,7 @@ var rzp1 = new Razorpay(options);
               <button
               onClick={() => pay(Number.parseInt(paymentform.amount) * 100)}
                 type="button"
-                className="text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2"
+                className="text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mb-2 "
               >
                 Pay
               </button>
